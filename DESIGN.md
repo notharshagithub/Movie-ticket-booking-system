@@ -1,32 +1,118 @@
-# Movie Booking System Design
+# Movie Ticket Booking System - Class Diagram
 
-Entities:
-Movie
-City
-Theatre -> Screen -> Seat
-Show
-Booking
+```mermaid
+classDiagram
 
-Enums:
-SeatType
-SeatStatus
-BookingStatus
+class Movie {
+  String id
+  String name
+  int duration
+}
 
-Services:
-SearchService
-BookingService
-SeatLockService
-PricingService
-PaymentService
+class City {
+  String name
+}
 
-Patterns:
-Strategy (Pricing, Payment)
-Factory (PaymentFactory)
+class Theatre {
+  String id
+  String name
+  City city
+}
 
-Flow:
-User -> Movie -> Show -> Seats -> Lock -> Payment -> Confirm
+class Screen {
+  String id
+}
 
-Constraints:
-No double booking
-Seat locking required
-Pricing based on seat type
+class Seat {
+  String id
+  SeatType type
+}
+
+class Show {
+  String id
+  Movie movie
+  Screen screen
+  LocalDateTime startTime
+}
+
+class Booking {
+  String id
+  Show show
+  List~Seat~ seats
+  BookingStatus status
+}
+
+class SeatLockService {
+  lockSeats()
+  confirmSeats()
+  releaseSeats()
+}
+
+class BookingService {
+  createBooking()
+}
+
+class PricingService {
+  calculate()
+}
+
+class PaymentService {
+  pay()
+}
+
+class PricingStrategy {
+  <<interface>>
+  calculatePrice()
+}
+
+class DefaultPricingStrategy {
+}
+
+class PaymentStrategy {
+  <<interface>>
+  pay()
+}
+
+class UPIPayment {
+}
+
+class CardPayment {
+}
+
+class PaymentFactory {
+  getPayment()
+}
+
+class SearchService {
+  <<interface>>
+  getMoviesByCity()
+  getTheatresByCity()
+  getShowsByMovie()
+}
+
+%% Relationships
+
+Theatre --> City
+Theatre --> Screen
+Screen --> Seat
+Show --> Movie
+Show --> Screen
+Booking --> Show
+Booking --> Seat
+
+BookingService --> SeatLockService
+BookingService --> PaymentService
+BookingService --> PricingService
+
+PricingService --> PricingStrategy
+DefaultPricingStrategy ..|> PricingStrategy
+
+PaymentService --> PaymentStrategy
+UPIPayment ..|> PaymentStrategy
+CardPayment ..|> PaymentStrategy
+PaymentFactory --> PaymentStrategy
+
+SearchService --> Movie
+SearchService --> Theatre
+SearchService --> Show
+```
